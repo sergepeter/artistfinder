@@ -10,6 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.music.dbpedia.finder.beans.Artist;
 import com.music.dbpedia.finder.service.IArtistService;
 
+/**
+ * Artist main REST controller
+ * 
+ * @author speter
+ *
+ */
 @RestController
 @RequestMapping("/rest")
 public class ArtistRestController {
@@ -22,5 +28,12 @@ public class ArtistRestController {
 		List<Artist> l = artistService.findByName(name);
 		return l;
 	}
+	
+	@RequestMapping("/artist")
+	public Artist getArtistDetails(@RequestParam(value = "uri",required = false) String uri) {
+		Artist artist = artistService.getArtistDetails(uri);
+		return artist;
+	}
+	
 	
 }

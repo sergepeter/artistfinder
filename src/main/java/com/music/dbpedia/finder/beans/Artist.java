@@ -1,25 +1,43 @@
 package com.music.dbpedia.finder.beans;
 
 import java.net.URL;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hp.hpl.jena.rdf.model.Resource;
 
+/**
+ * Artist bean
+ * @author speter
+ *
+ */
 public class Artist {
 
 	@JsonIgnore
-	private Resource artist;
+	private Resource resource;
 
 	private String name;
 	private String birthDate;
+	private String deathDate;
+	private String comment;
+	
+	private String imageURL;
 	
 	@JsonIgnore
 	private Resource birthPlace;
+	
+	@JsonIgnore
+	private Resource deathPlace;
 	
 	private String shortDescription;
 	private String abstractStr;
 	private String yearsActive;
 	private URL website;
+	
+	private List<String> instruments;	
+	private List<Artist> associatedArtists;
+	private List<Band> associatedBands;
+	private List<String> genres;
 
 	public Artist() {
 		super();
@@ -29,7 +47,7 @@ public class Artist {
 			Resource birthPlace, String shortDescription, String abstractStr,
 			String yearsActive, URL website) {
 		super();
-		this.artist = artist;
+		this.resource = artist;
 		this.name = name;
 		this.birthDate = birthDate;
 		this.birthPlace = birthPlace;
@@ -41,17 +59,19 @@ public class Artist {
 
 	@Override
 	public String toString() {
-		return "Artist [artist=" + artist + ", name=" + name + ", birthDate="
+		return "Artist [artist=" + resource + ", name=" + name + ", birthDate="
 				+ birthDate + ", birthPlace=" + birthPlace + ", yearsActive="
 				+ yearsActive + ", website=" + website + "]";
 	}
 
-	public Resource getArtist() {
-		return artist;
+	
+
+	public Resource getResource() {
+		return resource;
 	}
 
-	public void setArtist(Resource artist) {
-		this.artist = artist;
+	public void setResource(Resource resource) {
+		this.resource = resource;
 	}
 
 	public String getName() {
@@ -109,8 +129,63 @@ public class Artist {
 	public void setYearsActive(String yearsActive) {
 		this.yearsActive = yearsActive;
 	}
-
 	
+	public List<Artist> getAssociatedArtists() {
+		return associatedArtists;
+	}
+
+	public void setAssociatedArtists(List<Artist> associatedArtists) {
+		this.associatedArtists = associatedArtists;
+	}
+
+	public String getDeathDate() {
+		return deathDate;
+	}
+
+	public void setDeathDate(String deathDate) {
+		this.deathDate = deathDate;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	public Resource getDeathPlace() {
+		return deathPlace;
+	}
+
+	public void setDeathPlace(Resource deathPlace) {
+		this.deathPlace = deathPlace;
+	}
+
+	public List<String> getInstruments() {
+		return instruments;
+	}
+
+	public void setInstruments(List<String> instruments) {
+		this.instruments = instruments;
+	}
+
+	public List<String> getGenres() {
+		return genres;
+	}
+
+	public void setGenres(List<String> genres) {
+		this.genres = genres;
+	}
+	
+	public List<Band> getAssociatedBands() {
+		return associatedBands;
+	}
+
+	public void setAssociatedBands(List<Band> associatedBands) {
+		this.associatedBands = associatedBands;
+	}
+
 	public String getBirthPlaceURI() {
 		if (birthPlace != null && birthPlace instanceof Resource){
 			return birthPlace.getURI();
@@ -120,12 +195,22 @@ public class Artist {
 	}
 	
 	public String getArtistURI() {
-		if (artist != null && artist instanceof Resource){
-		return artist.getURI();
+		if (resource != null && resource instanceof Resource){
+		return resource.getURI();
 		} else {
 			return null;
 		}
 	}
+
+	public String getImageURL() {
+		return imageURL;
+	}
+
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
+	}
+
 	
 	
 }
+
