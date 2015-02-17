@@ -34,6 +34,4 @@ public class ArtistRestController {
 		Artist artist = artistService.getArtistDetails(uri);
 		return artist;
 	}
-	
-	
 }

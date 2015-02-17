@@ -49,5 +49,8 @@ public class TestBandService {
 		
 		assertEquals("Must be at least one genre. (Found " + bandDetail.getGenres().size()
 				+ " record.)", bandDetail.getGenres().size() > 0, true);
+		
+		assertEquals("Must  at least one former band artists. (Found " + bandDetail.getFormerBandMembers().size()
+				+ " record.)", bandDetail.getFormerBandMembers().size() > 0, true);
 	}
 }

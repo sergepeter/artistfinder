@@ -59,12 +59,11 @@ public class Artist {
 
 	@Override
 	public String toString() {
-		return "Artist [artist=" + resource + ", name=" + name + ", birthDate="
-				+ birthDate + ", birthPlace=" + birthPlace + ", yearsActive="
-				+ yearsActive + ", website=" + website + "]";
+		return "Artist [resource=" + resource + ", name=" + name
+				+ ", associatedArtists=" + associatedArtists
+				+ ", associatedBands=" + associatedBands + ", genres=" + genres
+				+ "]";
 	}
-
-	
 
 	public Resource getResource() {
 		return resource;

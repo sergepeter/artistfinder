@@ -26,11 +26,7 @@ public class BandService implements IBandService {
 
 	private static final Logger logger = Logger.getLogger(BandService.class.getName());
 	
-	@Override
-	public List<Band> findByName(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	@Override
 	public Band getBandDetails(String resourceURI) {
@@ -90,7 +86,10 @@ public class BandService implements IBandService {
 					List<String> genres = getGenres(band);
 					band.setGenres(genres);
 					
-					logger.log(Level.INFO, "Band found : " + band.toString());
+					List<Artist> formerMembers = getFormerMembers(band);
+					band.setFormerBandMembers(formerMembers);
+					
+					logger.log(Level.FINE, "Band found : " + band.toString());
 
 				}
 
@@ -213,6 +212,7 @@ public class BandService implements IBandService {
 	 * @param artist
 	 * @return
 	 */
+	@Override
 	public List<String> getGenres(Band band) {
 
 		List<String> genres = new ArrayList<String>();
@@ -258,4 +258,55 @@ public class BandService implements IBandService {
 		return genres;
 	}
 
+	@Override
+	public List<Artist> getFormerMembers(Band band) {
+		List<Artist> artists = new ArrayList<Artist>();
+
+		String queryString = " prefix prop: <http://dbpedia.org/property/> \n" 
+				+ " prefix owl: <http://dbpedia.org/ontology/>\n"
+				+ " prefix res: <http://dbpedia.org/resource/> \n" 
+				+ " prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
+				+ " select distinct ?artist ?name ?formerBandMember ?assName "
+				+ " where {"
+				+ " ?band owl:sameAs? <" + band.getBandURI() + "> .\n"
+				+ " ?band rdfs:label ?name ."
+				+ " ?band owl:formerBandMember  ?formerBandMember. "
+				+ " ?formerBandMember rdfs:label ?assName . "
+				+ " FILTER (langMatches(lang(?name), 'fr') && langMatches(lang(?assName), 'fr'))\n" 
+				+ "	} LIMIT " + rowLimit + "\n"; 
+				
+
+		Query query = QueryFactory.create(queryString);
+
+		QueryExecution qe = QueryExecutionFactory.sparqlService(serviceURL, query);
+
+		try {
+
+			ResultSet res = qe.execSelect();
+
+			Artist artist = new Artist();
+
+			while (res.hasNext()) {
+
+				QuerySolution row = res.next();
+
+				artist.setResource(ParseUtils.parseXmlResource(row.get("formerBandMember").asResource()));
+				artist.setName(ParseUtils.parsXMLString(row.get("assName")));
+				
+				artists.add(artist);
+				logger.log(Level.FINE, "Former Band Memeber found : " + artist);
+			}
+
+			return artists;
+
+		} catch (QueryExceptionHTTP e) {
+			logger.log(Level.SEVERE, serviceURL + " is DOWN", e);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, serviceURL + " is on error : ", e);
+		} finally {
+			qe.close();
+		}
+		return artists;
+	}
+	
 }

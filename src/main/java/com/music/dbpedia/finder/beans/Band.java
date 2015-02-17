@@ -35,9 +35,9 @@ public class Band {
 
 	@Override
 	public String toString() {
-		return "Band [resource=" + resource + ", name=" + name
-				+ ", activeYearsEndYear=" + activeYearsEndYear
-				+ ", activeYearsStartYear=" + activeYearsStartYear + "]";
+		return "Band [resource=" + resource + ", name=" + name + ", genres="
+				+ genres + ", associatedArtists=" + associatedArtists
+				+ ", associatedBands=" + associatedBands + "]";
 	}
 
 	public Resource getResource() {
