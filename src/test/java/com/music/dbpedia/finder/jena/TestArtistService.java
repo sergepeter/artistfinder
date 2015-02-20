@@ -35,7 +35,7 @@ public class TestArtistService {
 	@Test
 	public void testFindArtistByName() {
 
-		List<Artist> artists = artisteService.findByName("mark knopfler");
+		List<Artist> artists = artisteService.findByName("van halen");
 		assertNotNull(artists);
 		assertEquals("Must find at least one record. (Found " + artists.size()
 				+ " record.)", artists.size() > 0, true);
@@ -45,7 +45,7 @@ public class TestArtistService {
 	public void testGetDetails() {
 		Artist artist = null;
 
-		List<Artist> artists = artisteService.findByName("mark knopfler");
+		List<Artist> artists = artisteService.findByName("knopfler");
 		if (artists != null && artists.size() > 0) {
 			artist = artists.get(0);
 		}

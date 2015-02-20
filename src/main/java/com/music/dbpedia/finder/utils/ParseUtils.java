@@ -21,6 +21,7 @@ public class ParseUtils {
 			}
 		} catch (DatatypeFormatException e) {
 			logger.log(Level.WARNING, "Error on date field parsing : " + e.getMessage());
+			e.printStackTrace();
 		}
 		return toReturn;
 	}
@@ -33,6 +34,7 @@ public class ParseUtils {
 			}
 		} catch (DatatypeFormatException e) {
 			logger.log(Level.WARNING, "Error on date field parsing : " + e.getMessage());
+			e.printStackTrace();
 		}
 		return toReturn;
 	}
@@ -44,7 +46,8 @@ public class ParseUtils {
 				toReturn = node.asLiteral().getValue().toString();
 			}
 		} catch (DatatypeFormatException e) {
-			logger.log(Level.WARNING, "Error on date field parsing : " + e.getMessage());
+			logger.log(Level.WARNING, "Error on string field parsing : " + e.getMessage());
+			e.printStackTrace();
 		}
 		return toReturn;
 	}
@@ -57,7 +60,8 @@ public class ParseUtils {
 				toReturn = new URL(node.toString());
 			}
 		} catch (MalformedURLException e) {
-			logger.log(Level.WARNING, "Error on date field parsing : " + e.getMessage());
+			logger.log(Level.WARNING, "Error on URL field parsing : " + e.getMessage());
+			e.printStackTrace();
 		}
 		return toReturn;
 	}

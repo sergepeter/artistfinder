@@ -43,17 +43,16 @@ public class ArtistService implements IArtistService {
 				+ " prefix owl: <http://dbpedia.org/ontology/>\n"
 				+ " prefix res: <http://dbpedia.org/resource/> \n" 
 				+ " prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
-				+ " select distinct ?artist ?name ?birthDate ?birthPlace ?shortDescription ?abstract ?yearsActive ?website\n" 
+				+ " select distinct *\n" 
 				+ " where {\n" 
 				+ " ?artist a owl:MusicalArtist .\n"
 				+ " ?artist rdfs:label ?name .\n" 
 				+ " OPTIONAL { ?artist owl:birthDate ?birthDate }\n" 
-				+ " OPTIONAL { ?artist owl:birthPlace ?birthPlace }\n"
 				+ " OPTIONAL { ?artist prop:shortDescription ?shortDescription }\n" 
-				+ " OPTIONAL { ?artist owl:abstract ?abstract }\n"
 				+ " OPTIONAL { ?artist prop:website ?website  }\n"
 				+ " OPTIONAL { ?artist prop:yearsActive ?yearsActive }\n" 
-				+ " FILTER (regex(?name, '.*" + name + ".*', 'i') && langMatches(lang(?name), 'en') && langMatches(lang(?abstract), 'en'))\n" 
+				+ " FILTER (regex(?name, '.*" + name + ".*', 'i') "
+						+ "&& langMatches(lang(?name), 'en'))\n" 
 				+ "	} LIMIT " + rowLimit + "\n";
 
 		Query query = QueryFactory.create(queryString);
@@ -70,10 +69,9 @@ public class ArtistService implements IArtistService {
 
 				QuerySolution row = res.next();
 
+				artist = new Artist();
 				artist.setResource(ParseUtils.parseXmlResource(row.get("artist").asResource()));
-				artist.setAbstractStr(ParseUtils.parsXMLString(row.get("abstract")));
 				artist.setBirthDate(ParseUtils.parseXmlDate(row.get("birthDate")));
-				artist.setBirthPlace(ParseUtils.parseXmlResource(row.get("birthPlace")));
 				artist.setName(ParseUtils.parseXmlDate(row.get("name")));
 				artist.setShortDescription(ParseUtils.parsXMLString(row.get("shortDescription")));
 				artist.setYearsActive(ParseUtils.parsXMLString(row.get("yearsActive")));
@@ -90,6 +88,7 @@ public class ArtistService implements IArtistService {
 			logger.log(Level.SEVERE, serviceURL + " is DOWN", e);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, serviceURL + " is on error : ", e);
+			e.printStackTrace();
 		} finally {
 			qe.close();
 		}
