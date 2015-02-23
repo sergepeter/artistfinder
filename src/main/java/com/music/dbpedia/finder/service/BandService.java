@@ -64,7 +64,7 @@ public class BandService implements IBandService {
 
 				// should have only one row
 				while (res.hasNext()) {
-
+					
 					QuerySolution row = res.next();
 
 					band.setName(ParseUtils.parsXMLString(row.get("name")));
@@ -121,6 +121,9 @@ public class BandService implements IBandService {
 				+ " ?band rdfs:label ?name ."
 				+ " ?band owl:associatedBand ?associatedBand. "
 				+ " ?associatedBand rdfs:label ?assName . "
+				+ " ?associatedBand owl:background ?background. \n"					
+				+ " FILTER (?background == 'group_or_band')\n"
+
 				+ " FILTER (langMatches(lang(?name), 'fr') && langMatches(lang(?assName), 'fr'))\n" 
 				+ "	} LIMIT " + rowLimit + "\n";
 		
@@ -132,11 +135,13 @@ public class BandService implements IBandService {
 
 			ResultSet res = qe.execSelect();
 
-			Band associatedBand = new Band();
+			
 
 			while (res.hasNext()) {
 
 				QuerySolution row = res.next();
+				
+				Band associatedBand = new Band();
 
 				associatedBand.setResource(ParseUtils.parseXmlResource(row.get("associatedBand").asResource()));
 				associatedBand.setName(ParseUtils.parsXMLString(row.get("assName")));
@@ -169,6 +174,10 @@ public class BandService implements IBandService {
 				+ " ?band owl:sameAs? <" + band.getBandURI() + "> .\n"
 				+ " ?band rdfs:label ?name ."
 				+ " ?band owl:associatedMusicalArtist  ?associatedArtist. "
+
+				+ " ?associatedArtist owl:background ?background. \n"					
+				+ " FILTER (?background != 'group_or_band')\n"
+				
 				+ " ?associatedArtist rdfs:label ?assName . "
 				+ " FILTER (langMatches(lang(?name), 'fr') && langMatches(lang(?assName), 'fr'))\n" 
 				+ "	} LIMIT " + rowLimit + "\n"; 
@@ -182,11 +191,13 @@ public class BandService implements IBandService {
 
 			ResultSet res = qe.execSelect();
 
-			Artist associatedArtist = new Artist();
+			
 
 			while (res.hasNext()) {
 
 				QuerySolution row = res.next();
+				
+				Artist associatedArtist = new Artist();
 
 				associatedArtist.setResource(ParseUtils.parseXmlResource(row.get("associatedArtist").asResource()));
 				associatedArtist.setName(ParseUtils.parsXMLString(row.get("assName")));
@@ -271,6 +282,11 @@ public class BandService implements IBandService {
 				+ " ?band owl:sameAs? <" + band.getBandURI() + "> .\n"
 				+ " ?band rdfs:label ?name ."
 				+ " ?band owl:formerBandMember  ?formerBandMember. "
+				
+				+ " ?formerBandMember owl:background ?background. \n"					
+				+ " FILTER (?background != 'group_or_band')\n"
+
+				
 				+ " ?formerBandMember rdfs:label ?assName . "
 				+ " FILTER (langMatches(lang(?name), 'fr') && langMatches(lang(?assName), 'fr'))\n" 
 				+ "	} LIMIT " + rowLimit + "\n"; 

@@ -101,7 +101,7 @@ public class ArtistService implements IArtistService {
 	@Override
 	public Artist getArtistDetails(String resourceURI) {
 
-		Artist artist = new Artist();
+		Artist artist = null;
 		
 		String queryString = " prefix prop: <http://dbpedia.org/property/> \n" 
 				+ " prefix owl: <http://dbpedia.org/ontology/>\n"
@@ -111,14 +111,20 @@ public class ArtistService implements IArtistService {
 				+ " where {\n" 
 				+ " ?artist owl:sameAs? <" + resourceURI + "> .\n"
 				+ " ?artist rdfs:label ?name .\n" 
-				+ " OPTIONAL { ?artist owl:birthDate ?birthDate }\n" 
-				+ " OPTIONAL { ?artist owl:birthPlace ?birthPlace }\n"
+				+ " OPTIONAL { ?artist owl:birthDate ?birthDate } \n"
+				+ " OPTIONAL { ?artist owl:deathDate ?deathDate } \n" 
+				+ " OPTIONAL { ?artist owl:birthPlace ?birthPlace } \n"
+				+ " OPTIONAL { ?birthPlace rdfs:label ?birthPlaceStr }\n"
+				+ " OPTIONAL { ?artist owl:deathPlace ?deathPlace } \n"
+				+ " OPTIONAL { ?deathPlace rdfs:label ?deathPlaceStr }\n" 
 				+ " OPTIONAL { ?artist owl:thumbnail ?image} \n"
 				+ " OPTIONAL { ?artist prop:shortDescription ?shortDescription }\n" 
 				+ " OPTIONAL { ?artist owl:abstract ?abstract }\n"
 				+ " OPTIONAL { ?artist prop:website ?website  }\n"
 				+ " OPTIONAL { ?artist prop:yearsActive ?yearsActive }\n" 
-				+ " FILTER (langMatches(lang(?name), 'en') && langMatches(lang(?abstract), 'en'))\n" 
+				+ " FILTER (langMatches(lang(?name), 'en') \n" 
+				+ " && langMatches(lang(?birthPlaceStr), 'en')\n" 
+				+ " && langMatches(lang(?abstract), 'en')) \n" 
 				+ "	} LIMIT 1\n";
 
 		Query query = QueryFactory.create(queryString);
@@ -133,13 +139,28 @@ public class ArtistService implements IArtistService {
 			while (res.hasNext()) {
 
 				QuerySolution row = res.next();
+				
+				artist = new Artist();
 
 				artist.setResource(ParseUtils.parseXmlResource(row.get("artist").asResource()));
 				artist.setAbstractStr(ParseUtils.parsXMLString(row.get("abstract")));
+				
 				artist.setBirthDate(ParseUtils.parseXmlDate(row.get("birthDate")));
-				artist.setImageURL(ParseUtils.parsXMLString(row.get("image")));
+				
+				
+				artist.setDeathDate(ParseUtils.parseXmlDate(row.get("deathDate")));
+				
+				if (row.get("image") != null) {
+					artist.setImageURL(ParseUtils.parseXmlURL(row.get("image")).toString());
+				}
 				
 				artist.setBirthPlace(ParseUtils.parseXmlResource(row.get("birthPlace")));
+				artist.setDeathPlace(ParseUtils.parseXmlResource(row.get("deathPlace")));
+				
+				artist.setBirthPlaceStr(ParseUtils.parsXMLString(row.get("birthPlaceStr")));
+				artist.setDeathPlaceStr(ParseUtils.parsXMLString(row.get("deathPlaceStr")));
+				
+				
 				artist.setName(ParseUtils.parseXmlDate(row.get("name")));
 				artist.setShortDescription(ParseUtils.parsXMLString(row.get("shortDescription")));
 				artist.setYearsActive(ParseUtils.parsXMLString(row.get("yearsActive")));
@@ -153,6 +174,9 @@ public class ArtistService implements IArtistService {
 				
 				List<String> genres = getGenres(artist);
 				artist.setGenres(genres);
+				
+				List<String> intruments = getInstruments(artist);
+				artist.setInstruments(intruments);
 				
 				logger.log(Level.INFO, "Artist found : " + artist.toString());
 
@@ -189,8 +213,11 @@ public class ArtistService implements IArtistService {
 					+ " ?artist owl:sameAs? <" + artist.getArtistURI() + "> .\n"
 					+ " ?artist rdfs:label ?name ."
 					+ " ?artist owl:associatedMusicalArtist  ?associatedArtist. "
-					+ " ?associatedArtist rdfs:label ?assName . "
-					+ " FILTER (langMatches(lang(?name), 'en') && langMatches(lang(?assName), 'en'))\n" 
+					+ " ?associatedArtist owl:background ?background. \n"					
+					+ " FILTER (?background != 'group_or_band')\n"
+					+ " ?associatedArtist rdfs:label ?assName .\n"
+					+ " FILTER (langMatches(lang(?name), 'en')\n"
+					+ " && langMatches(lang(?assName), 'en'))\n" 
 					+ "	} LIMIT " + rowLimit + "\n"; 
 					
 
@@ -202,11 +229,13 @@ public class ArtistService implements IArtistService {
 
 				ResultSet res = qe.execSelect();
 
-				Artist associatedArtist = new Artist();
+				
 
 				while (res.hasNext()) {
 
 					QuerySolution row = res.next();
+					
+					Artist associatedArtist = new Artist();
 
 					associatedArtist.setResource(ParseUtils.parseXmlResource(row.get("associatedArtist").asResource()));
 					associatedArtist.setName(ParseUtils.parsXMLString(row.get("assName")));
@@ -245,10 +274,13 @@ public class ArtistService implements IArtistService {
 					+ " select distinct * "
 					+ " where {"
 					+ " ?artist owl:sameAs? <" + artist.getArtistURI() + "> .\n"
-					+ " ?artist rdfs:label ?name ."
-					+ " ?artist owl:associatedBand ?associatedBand. "
-					+ " ?associatedBand rdfs:label ?assName . "
-					+ " FILTER (langMatches(lang(?name), 'en') && langMatches(lang(?assName), 'en'))\n" 
+					+ " ?artist rdfs:label ?name .\n"
+					+ " ?artist owl:associatedBand ?associatedBand.\n"
+					+ " ?associatedBand rdfs:label ?assName .\n"					
+					+ " ?associatedBand owl:background ?background. \n"					
+					+ " FILTER (?background = 'group_or_band')\n"
+					+ " FILTER (langMatches(lang(?name), 'en')\n "
+					+ " && langMatches(lang(?assName), 'en'))\n" 
 					+ "	} LIMIT " + rowLimit + "\n";
 			
 			Query query = QueryFactory.create(queryString);
@@ -259,14 +291,16 @@ public class ArtistService implements IArtistService {
 
 				ResultSet res = qe.execSelect();
 
-				Band associatedBand = new Band();
 
 				while (res.hasNext()) {
 
 					QuerySolution row = res.next();
+					
+					Band associatedBand = new Band();
 
 					associatedBand.setResource(ParseUtils.parseXmlResource(row.get("associatedBand").asResource()));
 					associatedBand.setName(ParseUtils.parsXMLString(row.get("assName")));
+					
 					bands.add(associatedBand);
 					logger.log(Level.FINE, "Band found : " + associatedBand);
 				}
@@ -298,7 +332,7 @@ public class ArtistService implements IArtistService {
 				+ " prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
 				+ "select *\n"
 				+ "where {\n"
-				+ "?artist owl:sameAs? <http://dbpedia.org/resource/Mark_Knopfler> .\n"
+				+ " ?artist owl:sameAs? <" + artist.getArtistURI() + "> .\n"
 				+ "?artist rdfs:label ?name .\n"
 				+ "OPTIONAL { ?artist owl:genre ?genre}\n"
 				+ "OPTIONAL { ?genre rdfs:label  ?genrelabel}\n"
@@ -331,5 +365,55 @@ public class ArtistService implements IArtistService {
 			qe.close();
 		}
 		return genres;
+	}
+	
+	/**
+	 * Get list of intruments
+	 * @param artist
+	 * @return
+	 */
+	public List<String> getInstruments(Artist artist) {
+
+		List<String> intruments = new ArrayList<String>();
+
+		String queryString = " prefix prop: <http://dbpedia.org/property/> \n"
+				+ " prefix owl: <http://dbpedia.org/ontology/>\n"
+				+ " prefix res: <http://dbpedia.org/resource/> \n"
+				+ " prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
+				+ "select *\n"
+				+ "where {\n"
+				+ " ?artist owl:sameAs? <" + artist.getArtistURI() + "> .\n"
+				+ "?artist rdfs:label ?name .\n"
+				+ "OPTIONAL { ?artist owl:instrument ?intrument}\n"
+				+ "OPTIONAL { ?intrument rdfs:label  ?intrumentlabel}\n"
+				+ "FILTER (langMatches(lang(?name), 'en') && langMatches(lang(?intrumentlabel), 'en') )\n"
+				+ "} LIMIT 10 \n";
+
+		Query query = QueryFactory.create(queryString);
+
+		QueryExecution qe = QueryExecutionFactory.sparqlService(serviceURL,
+				query);
+
+		try {
+
+			ResultSet res = qe.execSelect();
+			while (res.hasNext()) {
+
+				QuerySolution row = res.next();
+				String intrument = (ParseUtils.parsXMLString(row.get("intrumentlabel")));
+				intruments.add(intrument);
+				logger.log(Level.FINE, "Genre found : " + intruments);
+			}
+
+			return intruments;
+
+		} catch (QueryExceptionHTTP e) {
+			logger.log(Level.SEVERE, serviceURL + " is DOWN", e);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, serviceURL + " is on error : ", e);
+		} finally {
+			qe.close();
+		}
+		return intruments;
 	}
 }

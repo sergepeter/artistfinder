@@ -26,8 +26,12 @@ public class Artist {
 	@JsonIgnore
 	private Resource birthPlace;
 	
+	private String birthPlaceStr;
+	
 	@JsonIgnore
 	private Resource deathPlace;
+	
+	private String deathPlaceStr;
 	
 	private String shortDescription;
 	private String abstractStr;
@@ -207,6 +211,22 @@ public class Artist {
 
 	public void setImageURL(String imageURL) {
 		this.imageURL = imageURL;
+	}
+
+	public String getBirthPlaceStr() {
+		return birthPlaceStr;
+	}
+
+	public void setBirthPlaceStr(String birthPlaceStr) {
+		this.birthPlaceStr = birthPlaceStr;
+	}
+
+	public String getDeathPlaceStr() {
+		return deathPlaceStr;
+	}
+
+	public void setDeathPlaceStr(String deathPlaceStr) {
+		this.deathPlaceStr = deathPlaceStr;
 	}
 
 	
