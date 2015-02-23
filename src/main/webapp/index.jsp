@@ -176,12 +176,22 @@
 				<table class="table table-striped table-bordered" ng-show="band">
 					<tr>
 						<th width=200>Name</th>
-						<td>{{band.name}} (<a href="{{band.artistURI}}">URI</a>)
+						<td>{{band.name}} (<a href="{{band.bandURI}}">URI</a>)
 						</td>
 					</tr>
 					<tr>
 						<th width=200>Short Description</th>
-						<td>{{band.shortDescription}}</td>
+						<td>{{band.abstractStr}}</td>
+					</tr>
+					
+					<tr>
+						<th width=200>Home Town</th>
+						<td>{{band.hometown}}</td>
+					</tr>
+					
+					<tr ng-show="band.imageURL">
+						<th>Image</th>
+						<td><img src="{{band.imageURL}}" width=300 /></td>
 					</tr>
 				
 					<tr ng-show="band.associatedArtists">
@@ -189,6 +199,15 @@
 						<td>
 							<ul style="list-style-type: disc">
 								<li ng-repeat="associatedArtist in band.associatedArtists"><a href="" ng-click="treatePage('artist', associatedArtist.artistURI)">{{associatedArtist.name}}</a></li>
+							</ul>
+						</td>
+					</tr>
+					
+					<tr ng-show="band.formerBandMembers">
+						<th>Associated Artists</th>
+						<td>
+							<ul style="list-style-type: disc">
+								<li ng-repeat="formerBandMember in band.formerBandMembers"><a href="" ng-click="treatePage('artist', associatedArtist.artistURI)">{{formerBandMember.name}}</a></li>
 							</ul>
 						</td>
 					</tr>

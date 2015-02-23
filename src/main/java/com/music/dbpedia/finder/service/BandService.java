@@ -122,7 +122,7 @@ public class BandService implements IBandService {
 				+ " ?band owl:associatedBand ?associatedBand. "
 				+ " ?associatedBand rdfs:label ?assName . "
 				+ " ?associatedBand owl:background ?background. \n"					
-				+ " FILTER (?background == 'group_or_band')\n"
+				+ " FILTER (?background = 'group_or_band')\n"
 
 				+ " FILTER (langMatches(lang(?name), 'fr') && langMatches(lang(?assName), 'fr'))\n" 
 				+ "	} LIMIT " + rowLimit + "\n";
