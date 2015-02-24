@@ -27,6 +27,7 @@ public class Artist {
 	private Resource birthPlace;
 	
 	private String birthPlaceStr;
+	private String country;
 	
 	@JsonIgnore
 	private Resource deathPlace;
@@ -227,6 +228,14 @@ public class Artist {
 
 	public void setDeathPlaceStr(String deathPlaceStr) {
 		this.deathPlaceStr = deathPlaceStr;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
 	}
 
 	

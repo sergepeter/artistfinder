@@ -73,8 +73,8 @@ public class ArtistService implements IArtistService {
 				artist.setResource(ParseUtils.parseXmlResource(row.get("artist").asResource()));
 				artist.setBirthDate(ParseUtils.parseXmlDate(row.get("birthDate")));
 				artist.setName(ParseUtils.parseXmlDate(row.get("name")));
-				artist.setShortDescription(ParseUtils.parsXMLString(row.get("shortDescription")));
-				artist.setYearsActive(ParseUtils.parsXMLString(row.get("yearsActive")));
+				artist.setShortDescription(ParseUtils.parseXMLString(row.get("shortDescription")));
+				artist.setYearsActive(ParseUtils.parseXMLString(row.get("yearsActive")));
 				artist.setWebsite(ParseUtils.parseXmlURL(row.get("website")));
 
 				artists.add(artist);
@@ -115,6 +115,7 @@ public class ArtistService implements IArtistService {
 				+ " OPTIONAL { ?artist owl:deathDate ?deathDate } \n" 
 				+ " OPTIONAL { ?artist owl:birthPlace ?birthPlace } \n"
 				+ " OPTIONAL { ?birthPlace rdfs:label ?birthPlaceStr }\n"
+				+ " OPTIONAL { ?birthPlace prop:country ?country }\n"
 				+ " OPTIONAL { ?artist owl:deathPlace ?deathPlace } \n"
 				+ " OPTIONAL { ?deathPlace rdfs:label ?deathPlaceStr }\n" 
 				+ " OPTIONAL { ?artist owl:thumbnail ?image} \n"
@@ -143,12 +144,13 @@ public class ArtistService implements IArtistService {
 				artist = new Artist();
 
 				artist.setResource(ParseUtils.parseXmlResource(row.get("artist").asResource()));
-				artist.setAbstractStr(ParseUtils.parsXMLString(row.get("abstract")));
+				artist.setAbstractStr(ParseUtils.parseXMLString(row.get("abstract")));
 				
 				artist.setBirthDate(ParseUtils.parseXmlDate(row.get("birthDate")));
 				
 				
 				artist.setDeathDate(ParseUtils.parseXmlDate(row.get("deathDate")));
+				artist.setCountry(ParseUtils.parseXMLString(row.get("country")));
 				
 				if (row.get("image") != null) {
 					artist.setImageURL(ParseUtils.parseXmlURL(row.get("image")).toString());
@@ -157,26 +159,14 @@ public class ArtistService implements IArtistService {
 				artist.setBirthPlace(ParseUtils.parseXmlResource(row.get("birthPlace")));
 				artist.setDeathPlace(ParseUtils.parseXmlResource(row.get("deathPlace")));
 				
-				artist.setBirthPlaceStr(ParseUtils.parsXMLString(row.get("birthPlaceStr")));
-				artist.setDeathPlaceStr(ParseUtils.parsXMLString(row.get("deathPlaceStr")));
+				artist.setBirthPlaceStr(ParseUtils.parseXMLString(row.get("birthPlaceStr")));
+				artist.setDeathPlaceStr(ParseUtils.parseXMLString(row.get("deathPlaceStr")));
 				
 				
 				artist.setName(ParseUtils.parseXmlDate(row.get("name")));
-				artist.setShortDescription(ParseUtils.parsXMLString(row.get("shortDescription")));
-				artist.setYearsActive(ParseUtils.parsXMLString(row.get("yearsActive")));
+				artist.setShortDescription(ParseUtils.parseXMLString(row.get("shortDescription")));
+				artist.setYearsActive(ParseUtils.parseXMLString(row.get("yearsActive")));
 				artist.setWebsite(ParseUtils.parseXmlURL(row.get("website")));
-				
-				List<Band> associatedBands = getAssociatedBands(artist);
-				artist.setAssociatedBands(associatedBands);
-				
-				List<Artist> associatedArtists = getAssociatedArtists(artist);
-				artist.setAssociatedArtists(associatedArtists);
-				
-				List<String> genres = getGenres(artist);
-				artist.setGenres(genres);
-				
-				List<String> intruments = getInstruments(artist);
-				artist.setInstruments(intruments);
 				
 				logger.log(Level.INFO, "Artist found : " + artist.toString());
 
@@ -194,6 +184,27 @@ public class ArtistService implements IArtistService {
 		return artist;
 	}
 
+	
+	@Override
+	public Artist getArtistFullDetails(String uri) {
+		
+		Artist artist = getArtistDetails(uri);
+		
+		List<Band> associatedBands = getAssociatedBands(artist);
+		artist.setAssociatedBands(associatedBands);
+		
+		List<Artist> associatedArtists = getAssociatedArtists(artist);
+		artist.setAssociatedArtists(associatedArtists);
+		
+		List<String> genres = getGenres(artist);
+		artist.setGenres(genres);
+		
+		List<String> intruments = getInstruments(artist);
+		artist.setInstruments(intruments);
+		
+		return artist;
+	}
+	
 	/**
 	 * Get list of associated artists
 	 * @param artist
@@ -238,7 +249,7 @@ public class ArtistService implements IArtistService {
 					Artist associatedArtist = new Artist();
 
 					associatedArtist.setResource(ParseUtils.parseXmlResource(row.get("associatedArtist").asResource()));
-					associatedArtist.setName(ParseUtils.parsXMLString(row.get("assName")));
+					associatedArtist.setName(ParseUtils.parseXMLString(row.get("assName")));
 					
 					artists.add(associatedArtist);
 					logger.log(Level.FINE, "Artist found : " + associatedArtist);
@@ -299,7 +310,7 @@ public class ArtistService implements IArtistService {
 					Band associatedBand = new Band();
 
 					associatedBand.setResource(ParseUtils.parseXmlResource(row.get("associatedBand").asResource()));
-					associatedBand.setName(ParseUtils.parsXMLString(row.get("assName")));
+					associatedBand.setName(ParseUtils.parseXMLString(row.get("assName")));
 					
 					bands.add(associatedBand);
 					logger.log(Level.FINE, "Band found : " + associatedBand);
@@ -350,7 +361,7 @@ public class ArtistService implements IArtistService {
 			while (res.hasNext()) {
 
 				QuerySolution row = res.next();
-				String genre = (ParseUtils.parsXMLString(row.get("genrelabel")));
+				String genre = (ParseUtils.parseXMLString(row.get("genrelabel")));
 				genres.add(genre);
 				logger.log(Level.FINE, "Genre found : " + genre);
 			}
@@ -400,7 +411,7 @@ public class ArtistService implements IArtistService {
 			while (res.hasNext()) {
 
 				QuerySolution row = res.next();
-				String intrument = (ParseUtils.parsXMLString(row.get("intrumentlabel")));
+				String intrument = (ParseUtils.parseXMLString(row.get("intrumentlabel")));
 				intruments.add(intrument);
 				logger.log(Level.FINE, "Genre found : " + intruments);
 			}
@@ -416,4 +427,6 @@ public class ArtistService implements IArtistService {
 		}
 		return intruments;
 	}
+
+	
 }

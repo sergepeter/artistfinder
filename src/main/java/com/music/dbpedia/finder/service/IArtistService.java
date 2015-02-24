@@ -10,5 +10,5 @@ public interface IArtistService {
 	public Artist getArtistDetails(String resourceURI);
 	public List<Band> getAssociatedBands(Artist artist);
 	public List<Artist> getAssociatedArtists(Artist artist);
-	
+	public Artist getArtistFullDetails(String uri);	
 }

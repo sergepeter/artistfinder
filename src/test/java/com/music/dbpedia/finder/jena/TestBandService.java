@@ -2,6 +2,7 @@ package com.music.dbpedia.finder.jena;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.junit.Test;
@@ -30,6 +31,17 @@ public class TestBandService {
 	@Autowired
 	IBandService bandService;
 
+	@Test
+	public void testFindByName(){
+		
+		
+		List<Band> bands = bandService.findByName("straits");
+		
+		
+		assertEquals("Band must exists (" + bands.get(0).getName() + ")", 
+				bands.size() > 0, true);
+	}
+	
 	@Test
 	public void testGetDetails() {
 	

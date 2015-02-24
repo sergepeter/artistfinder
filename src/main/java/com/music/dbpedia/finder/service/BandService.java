@@ -25,13 +25,81 @@ public class BandService implements IBandService {
 	private String rowLimit = "100";
 
 	private static final Logger logger = Logger.getLogger(BandService.class.getName());
-	
-	
 
+	
+	/**
+	 * Find artist by name (firstname then last)
+	 */
+	@Override
+	public List<Band> findByName(String name) {
+
+		List<Band> bands = new ArrayList<Band>();
+
+		String queryString = " prefix prop: <http://dbpedia.org/property/> \n" 
+				+ " prefix owl: <http://dbpedia.org/ontology/>\n"
+				+ " prefix res: <http://dbpedia.org/resource/> \n" 
+				+ " prefix foaf: <http://xmlns.com/foaf/0.1/name/> \n"
+				
+				+ " prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
+				+ " select distinct *\n" 
+				+ " where {\n" 
+				
+				+ " ?band a owl:Organisation .\n"
+				+ " ?band rdfs:label ?name .\n"
+				+ " ?band owl:background ?background .\n"
+				
+				+ " OPTIONAL { ?band prop:yearsActive ?yearsActive }\n"
+				+ " OPTIONAL { ?band rdfs:comment ?comment }\n" 
+				+ " OPTIONAL { ?band foaf:isPrimaryTopicOf ?website  }\n"
+				
+				+ " FILTER (?background = 'group_or_band') \n" 
+				+ " FILTER (regex(?name, '.*" + name + ".*', 'i')\n"
+				+ " && langMatches(lang(?comment), 'en')\n"
+				+ " && langMatches(lang(?name), 'en'))\n"
+				+ "	} LIMIT " + rowLimit + "\n";
+
+		Query query = QueryFactory.create(queryString);
+
+		QueryExecution qe = QueryExecutionFactory.sparqlService(serviceURL, query);
+
+		try {
+
+			ResultSet res = qe.execSelect();
+
+			Band band = new Band();
+
+			while (res.hasNext()) {
+
+				QuerySolution row = res.next();
+
+				band = new Band();
+				band.setResource(ParseUtils.parseXmlResource(row.get("band").asResource()));
+				band.setName(ParseUtils.parseXMLString(row.get("name")));
+				band.setActiveYearsStartYear(ParseUtils.parseXMLString(row.get("yearsActive")));
+				band.setDescription(ParseUtils.parseXMLString(row.get("comment")));
+
+				bands.add(band);
+				logger.log(Level.INFO, "Artist found : " + band.toString());
+
+			}
+
+			return bands;
+
+		} catch (QueryExceptionHTTP e) {
+			logger.log(Level.SEVERE, serviceURL + " is DOWN", e);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, serviceURL + " is on error : ", e);
+			e.printStackTrace();
+		} finally {
+			qe.close();
+		}
+		return bands;
+	}
+	
 	@Override
 	public Band getBandDetails(String resourceURI) {
 
-			Band band = new Band();
+		Band band = new Band();
 			
 			String queryString = " prefix prop: <http://dbpedia.org/property/> \n" 
 					+ " prefix owl: <http://dbpedia.org/ontology/>\n"
@@ -39,7 +107,7 @@ public class BandService implements IBandService {
 					+ " prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
 					+ " select *\n"
 					+ " where {\n"
-					+ " ?band owl:sameAs? <http://dbpedia.org/resource/Dire_Straits> .\n"
+					+ " ?band owl:sameAs? <" + resourceURI + "> .\n"
 					+ " ?band rdfs:label ?name .\n"
 					+ " OPTIONAL { ?band prop:description ?description }\n"
 					+ " OPTIONAL { ?band owl:hometown ?hometown }\n"
@@ -65,30 +133,23 @@ public class BandService implements IBandService {
 				// should have only one row
 				while (res.hasNext()) {
 					
+					band = new Band();
+					
 					QuerySolution row = res.next();
 
-					band.setName(ParseUtils.parsXMLString(row.get("name")));
+					band.setName(ParseUtils.parseXMLString(row.get("name")));
 					band.setResource(ParseUtils.parseXmlResource(row.get("band").asResource()));
-					band.setAbstractStr(ParseUtils.parsXMLString(row.get("abstract")));
-					band.setDescription(ParseUtils.parsXMLString(row.get("description")));
-					band.setHometown(ParseUtils.parsXMLString(row.get("hometownname")));
-					band.setImageURL(ParseUtils.parsXMLString(row.get("image")));
-					band.setCountry(ParseUtils.parsXMLString(row.get("country")));
+					band.setAbstractStr(ParseUtils.parseXMLString(row.get("abstract")));
+					band.setDescription(ParseUtils.parseXMLString(row.get("description")));
+					band.setHometown(ParseUtils.parseXMLString(row.get("hometownname")));
+					
+					if (row.get("image") != null) {
+						band.setImageURL(ParseUtils.parseXmlURL(row.get("image")).toString());
+					}
+					band.setCountry(ParseUtils.parseXMLString(row.get("country")));
+					
 					band.setActiveYearsEndYear(ParseUtils.parseXmlDate(row.get("activeYearsEndYear")));
 					band.setActiveYearsStartYear(ParseUtils.parseXmlDate(row.get("activeYearsStartYear")));
-				
-					List<Band> associatedBands = getAssociatedBands(band);
-					band.setAssociatedBands(associatedBands);
-					
-					List<Artist> associatedArtists = getAssociatedArtists(band);
-					band.setAssociatedArtists(associatedArtists);
-					
-					List<String> genres = getGenres(band);
-					band.setGenres(genres);
-					
-					List<Artist> formerMembers = getFormerMembers(band);
-					band.setFormerBandMembers(formerMembers);
-					
 					logger.log(Level.FINE, "Band found : " + band.toString());
 
 				}
@@ -103,6 +164,32 @@ public class BandService implements IBandService {
 				qe.close();
 			}
 			return band;
+		
+		
+	}
+	
+	/**
+	 * Get all band details (more longer process)
+	 */
+	@Override
+	public Band getBandFullDetails(String resourceURI) {
+		
+		
+		Band band = getBandDetails(resourceURI);
+		
+		List<Band> associatedBands = getAssociatedBands(band);
+		band.setAssociatedBands(associatedBands);
+		
+		List<Artist> associatedArtists = getAssociatedArtists(band);
+		band.setAssociatedArtists(associatedArtists);
+		
+		List<String> genres = getGenres(band);
+		band.setGenres(genres);
+		
+		List<Artist> formerMembers = getFormerMembers(band);
+		band.setFormerBandMembers(formerMembers);
+		
+		return band;
 		
 		
 	}
@@ -144,7 +231,7 @@ public class BandService implements IBandService {
 				Band associatedBand = new Band();
 
 				associatedBand.setResource(ParseUtils.parseXmlResource(row.get("associatedBand").asResource()));
-				associatedBand.setName(ParseUtils.parsXMLString(row.get("assName")));
+				associatedBand.setName(ParseUtils.parseXMLString(row.get("assName")));
 				bands.add(associatedBand);
 				logger.log(Level.FINE, "Band found : " + associatedBand);
 			}
@@ -200,7 +287,7 @@ public class BandService implements IBandService {
 				Artist associatedArtist = new Artist();
 
 				associatedArtist.setResource(ParseUtils.parseXmlResource(row.get("associatedArtist").asResource()));
-				associatedArtist.setName(ParseUtils.parsXMLString(row.get("assName")));
+				associatedArtist.setName(ParseUtils.parseXMLString(row.get("assName")));
 				
 				artists.add(associatedArtist);
 				logger.log(Level.FINE, "Artist found : " + associatedArtist);
@@ -252,7 +339,7 @@ public class BandService implements IBandService {
 			while (res.hasNext()) {
 
 				QuerySolution row = res.next();
-				String genre = (ParseUtils.parsXMLString(row.get("genrelabel")));
+				String genre = (ParseUtils.parseXMLString(row.get("genrelabel")));
 				genres.add(genre);
 				logger.log(Level.FINE, "Genre found : " + genre);
 			}
@@ -300,14 +387,14 @@ public class BandService implements IBandService {
 
 			ResultSet res = qe.execSelect();
 
-			Artist artist = new Artist();
-
 			while (res.hasNext()) {
-
+				
 				QuerySolution row = res.next();
 
+				Artist artist = new Artist();
+				
 				artist.setResource(ParseUtils.parseXmlResource(row.get("formerBandMember").asResource()));
-				artist.setName(ParseUtils.parsXMLString(row.get("assName")));
+				artist.setName(ParseUtils.parseXMLString(row.get("assName")));
 				
 				artists.add(artist);
 				logger.log(Level.FINE, "Former Band Memeber found : " + artist);

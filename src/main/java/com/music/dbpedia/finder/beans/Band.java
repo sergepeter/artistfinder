@@ -104,7 +104,6 @@ public class Band {
 		}
 	}
 
-
 	public String getHometown() {
 		return hometown;
 	}
@@ -123,10 +122,6 @@ public class Band {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-
-
-
 
 	public List<Band> getAssociatedBands() {
 		return associatedBands;

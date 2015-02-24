@@ -11,4 +11,7 @@ public interface IBandService {
 	public List<Artist> getAssociatedArtists(Band band);
 	public List<String> getGenres(Band band);
 	public List<Artist> getFormerMembers(Band band);
+	public Band getBandFullDetails(String resourceURI);
+	public List<Band> findByName(String name);
+	
 }

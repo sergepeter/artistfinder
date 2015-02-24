@@ -20,8 +20,14 @@ public class ParseUtils {
 				toReturn = node.asLiteral().getValue().toString();
 			}
 		} catch (DatatypeFormatException e) {
+			
 			logger.log(Level.WARNING, "Error on date field parsing : " + e.getMessage());
-			e.printStackTrace();
+			try {
+				return node.toString();
+			} catch (Exception e1) {
+				logger.log(Level.WARNING, "Error on date field parsing : " + e1.getMessage());
+				return toReturn;
+			}
 		}
 		return toReturn;
 	}
@@ -39,7 +45,7 @@ public class ParseUtils {
 		return toReturn;
 	}
 	
-	public static String parsXMLString(RDFNode node) {
+	public static String parseXMLString(RDFNode node) {
 		String toReturn = "";
 		try {
 			if (node != null && node.isLiteral()) {
@@ -47,7 +53,12 @@ public class ParseUtils {
 			}
 		} catch (DatatypeFormatException e) {
 			logger.log(Level.WARNING, "Error on string field parsing : " + e.getMessage());
-			e.printStackTrace();
+			try {
+				return node.toString();
+			} catch (Exception e1) {
+				logger.log(Level.WARNING, "Error on string field parsing : " + e1.getMessage());
+				return toReturn;
+			}
 		}
 		return toReturn;
 	}

@@ -34,4 +34,10 @@ public class ArtistRestController {
 		Artist artist = artistService.getArtistDetails(uri);
 		return artist;
 	}
+	
+	@RequestMapping("/artistfull")
+	public Artist getArtistFullDetails(@RequestParam(value = "uri",required = false) String uri) {
+		Artist artist = artistService.getArtistFullDetails(uri);
+		return artist;
+	}
 }
