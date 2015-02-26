@@ -35,8 +35,7 @@ public class TestBandService {
 	public void testFindByName(){
 		
 		
-		List<Band> bands = bandService.findByName("straits");
-		
+		List<Band> bands = bandService.findByName("strait");
 		
 		assertEquals("Band must exists (" + bands.get(0).getName() + ")", 
 				bands.size() > 0, true);
@@ -46,7 +45,7 @@ public class TestBandService {
 	public void testGetDetails() {
 	
 		String bandURI = "http://dbpedia.org/resource/Dire_Straits";
-		Band bandDetail = bandService.getBandDetails(bandURI);
+		Band bandDetail = bandService.getBandFullDetails(bandURI);
 
 		logger.info("Name is " + bandDetail.getName());
 			

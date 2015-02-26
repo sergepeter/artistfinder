@@ -145,10 +145,7 @@ public class ArtistService implements IArtistService {
 
 				artist.setResource(ParseUtils.parseXmlResource(row.get("artist").asResource()));
 				artist.setAbstractStr(ParseUtils.parseXMLString(row.get("abstract")));
-				
 				artist.setBirthDate(ParseUtils.parseXmlDate(row.get("birthDate")));
-				
-				
 				artist.setDeathDate(ParseUtils.parseXmlDate(row.get("deathDate")));
 				artist.setCountry(ParseUtils.parseXMLString(row.get("country")));
 				
@@ -158,11 +155,8 @@ public class ArtistService implements IArtistService {
 				
 				artist.setBirthPlace(ParseUtils.parseXmlResource(row.get("birthPlace")));
 				artist.setDeathPlace(ParseUtils.parseXmlResource(row.get("deathPlace")));
-				
 				artist.setBirthPlaceStr(ParseUtils.parseXMLString(row.get("birthPlaceStr")));
 				artist.setDeathPlaceStr(ParseUtils.parseXMLString(row.get("deathPlaceStr")));
-				
-				
 				artist.setName(ParseUtils.parseXmlDate(row.get("name")));
 				artist.setShortDescription(ParseUtils.parseXMLString(row.get("shortDescription")));
 				artist.setYearsActive(ParseUtils.parseXMLString(row.get("yearsActive")));

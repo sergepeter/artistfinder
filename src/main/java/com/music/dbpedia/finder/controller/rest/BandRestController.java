@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.music.dbpedia.finder.beans.Artist;
 import com.music.dbpedia.finder.beans.Band;
 import com.music.dbpedia.finder.service.IBandService;
 
@@ -31,13 +30,13 @@ public class BandRestController {
 	}
 	
 	@RequestMapping("/band")
-	public Band getArtistDetails(@RequestParam(value = "uri",required = false) String uri) {
+	public Band getArtist(@RequestParam(value = "uri",required = false) String uri) {
 		Band artist = bandService.getBandDetails(uri);
 		return artist;
 	}
 	
 	@RequestMapping("/bandfull")
-	public Band getArtistFullDetails(@RequestParam(value = "uri",required = false) String uri) {
+	public Band getArtistFull(@RequestParam(value = "uri",required = false) String uri) {
 		Band artist = bandService.getBandFullDetails(uri);
 		return artist;
 	}

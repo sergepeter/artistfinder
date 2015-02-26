@@ -6,8 +6,8 @@
 	<artifactId>artistfinder</artifactId>
 	<version>1.0.0</version>
 	<packaging>war</packaging>
-
 	<name>finder</name>
+	
 	<url></url>
 
 	<properties>
@@ -94,14 +94,6 @@
 				<version>2.1</version>
 				<configuration>
 					<port>8380</port>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2.1</version>
-				<configuration>
-					<mainClass>org.test.int1.Main</mainClass>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -51,7 +51,7 @@ public class TestArtistService {
 		}
 
 		if (artist != null && artist.getResource() != null) {
-			Artist artistDetail = artisteService.getArtistDetails(artist.getArtistURI());
+			Artist artistDetail = artisteService.getArtistFullDetails(artist.getArtistURI());
 			logger.info("Name is " + artistDetail.getName() + " associated artists found : " + artistDetail.getAssociatedArtists().size());
 			logger.info("Name is " + artistDetail.getName() + " associated bands found : " + artistDetail.getAssociatedBands().size());
 			
