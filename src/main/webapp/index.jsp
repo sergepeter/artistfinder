@@ -15,6 +15,7 @@
 	<script type="text/javascript" src="resources/js/lib/jquery.js"></script>
 	<script type="text/javascript" src="resources/js/lib/angular.min.js"></script>
 	<script type="text/javascript" src="resources/bootstrap/js/bootstrap.min.js"></script>
+	
 	<script src="resources/js/angular/myapp.js"></script>
 
 </head>
