@@ -56,8 +56,6 @@ app.controller('artistSearchController', function($scope, $http) {
 					$scope.loading=false;
 
 				});
-		
-		
 	}
 
 	/**
